@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- Bootstrap -->
 <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+<link rel="stylesheet" href="css/jquery-ui-1.10.0.custom.css" />
+<link rel="stylesheet" href="css/jquery.ui.1.10.0.ie.css" />
 <link rel="stylesheet" href="css/jquery-ui.css" />
 <link rel="stylesheet" href="css/app.css" />
 </head>
@@ -75,7 +77,7 @@
 		</div>
 
 		<!-- control panel -->
-		<div class="row-fluid">
+		<div id="control-panel" class="row-fluid">
 
 			<div class="span2">
 				<img src="img/tvfinder-84x56.png" />
@@ -139,9 +141,9 @@
 
 		<div class="row-fluid">
 			<div class="span12">
-				<span><strong>8 MATCHES</strong> FOR TELEVISIONS FITTING THAT
+				<span><strong id="match-count">0 MATCHES</strong> FOR TELEVISIONS FITTING THAT
 					CRITERIA</span>
-				<button class="btn pull-right">Clear Filters</button>
+				<button id="clear-filters-button" class="btn pull-right">Clear Filters</button>
 			</div>
 
 		</div>
@@ -221,10 +223,18 @@
 
 	<!-- templates -->
 	<script type="text/template" id="product-template">
-	<img data-src="holder.js/300x200" alt="" class="product-image" src="<%= image %>" />
+	<a href="#" rel="clickover" data-content="
+            click over content.
+            &lt;pre&gt;$('[rel='clickover']').clickover();&lt;/pre&gt;
+            &lt;button class='btn' data-toggle='button' data-dismiss='clickover'
+            &gt;Close&lt;/button&gt;" data-original-title="clickover code" data-clickover-open="1" ></a>
+<img data-src="holder.js/300x200" alt=""  tabindex="0"  class="product-image" src="<%= image %>" />
 	<div><%= name %></div>
 	<div>$<%= price.toFixed(2) %></div>
 	<div class="rating"></div>
+	</script>
+	
+	<script type="text/template" id="clickover-placeholder-template">
 	</script>
 
 	<!-- JavaScript libraries -->
@@ -235,6 +245,7 @@
 	<script src="js/lib/underscore-min.js"></script>
 	<script src="js/lib/backbone-min.js"></script>
 	<script src="js/lib/jquery.raty.min.js"></script>
+	<script src="js/lib/bootstrapx-clickover.js"></script>
 
 	<!-- Config -->
 	<script src="js/config/Config.js"></script>

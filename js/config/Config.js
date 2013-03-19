@@ -2,8 +2,8 @@ var app = app || {};
 
 app.Config = {
 	// shelf
-	"productWidth" : 100,
-	"productHeight" : 100,
+	"productWidth" : 250,
+	"productHeight" : 280,
 
 	// effect
 	"animationDuration" : 600,

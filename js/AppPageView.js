@@ -10,17 +10,24 @@ app.AppPageView = Backbone.View.extend({
 		_.bindAll(this, "onBrandDropdownClicked");
 		_.bindAll(this, "onTypeDropdownClicked");
 		_.bindAll(this, "onSortDropdownClicked");
-		_.bindAll(this, "onSizeSliderChanged")
+		_.bindAll(this, "onSizeSliderChanged");
+		_.bindAll(this, "onClearFiltersButtonClicked");
+		_.bindAll(this, "onWindowResized");
 
 		$brandDropdown = $("#brand-dropdown");
-		$(document).on("click", "#brand-dropdown .dropdown-menu a", this.onBrandDropdownClicked);
-		
+		$(document).on("click", "#brand-dropdown .dropdown-menu a",
+				this.onBrandDropdownClicked);
+
 		$typeDropdown = $("#type-dropdown");
-		$(document).on("click", "#type-dropdown .dropdown-menu a", this.onTypeDropdownClicked);
-		
+		$(document).on("click", "#type-dropdown .dropdown-menu a",
+				this.onTypeDropdownClicked);
+
 		$sortDropdown = $("#sort-dropdown");
-		$(document).on("click", "#sort-dropdown .dropdown-menu a", this.onSortDropdownClicked);
-		
+		$(document).on("click", "#sort-dropdown .dropdown-menu a",
+				this.onSortDropdownClicked);
+
+		// should assign slider callback after productcollection fetch complete,
+		// otherwise generates unwanted events
 		$sizeSlider = $("#size-slider");
 		$sizeSlider.slider({
 			range : true,
@@ -28,13 +35,28 @@ app.AppPageView = Backbone.View.extend({
 			change : this.onSizeSliderChanged
 		});
 
+		$clearFiltersButton = $("#clear-filters-button");
+		$clearFiltersButton.on("click", this.onClearFiltersButtonClicked);
+		
+		$(window).on("resize", this.onWindowResized);
+		
+		//$("[rel=\"clickover\"]").clickover();
+		
 		$shelf = $("#shelf");
 
+		/*
+		this.$el.on("click", ".product-image", function() {
+
+			
+			$('[rel="clickover"]').clickover();
+		});*/
+		/*
 		this.$el.on("click", ".product-image", function() {
 			$('#myModal').modal({
 				"remote" : "data/product-detail/15105450.json"
 			});
 		});
+		*/
 
 		this.listenTo(this.options.productCollection, "reset",
 				this.onProductCollectionReset);
@@ -53,38 +75,42 @@ app.AppPageView = Backbone.View.extend({
 	onProductCollectionReset : function(collection, options) {
 
 		var productCollection = this.options.productCollection;
-		
+
 		// control panel
 		// brand
 		var brands = _.uniq(productCollection.pluck("brand"));
 		var brandHTMLs = [];
-		$.each(brands, function(i, brand) {
+		_.each(brands, function(brand, i) {
 			brandHTMLs.push("<li><a href=\"#\">" + brand + "</a></li>");
 		});
 		$brandDropdownMenu = $brandDropdown.find(".dropdown-menu");
 		$brandDropdownMenu.append(brandHTMLs.join(""));
-		
+
 		// type
-		var types = _.uniq(productCollection.pluck("type")); 
+		var types = _.uniq(productCollection.pluck("type"));
 		var typeHTMLs = [];
-		$.each(types, function(i, type) {
+		_.each(types, function(type, i) {
 			typeHTMLs.push("<li><a href=\"#\">" + type + "</a></li>");
 		});
 		$typeDropdownMenu = $typeDropdown.find(".dropdown-menu");
 		$typeDropdownMenu.append(typeHTMLs.join(""));
-		
+
 		// slider
 		var minSize = _.min(productCollection.pluck("size"));
 		var maxSize = _.max(productCollection.pluck("size"));
-		$sizeSlider = $("#size-slider");
 		$sizeSlider.slider("option", "range", true);
 		$sizeSlider.slider("option", "min", minSize);
 		$sizeSlider.slider("option", "max", maxSize);
-		$sizeSlider.slider("option", "values", [minSize, maxSize]);
+
+		$sizeSlider.slider("option", "values", [ minSize, maxSize ]);
+
+		// control panel
+		$("#control-panel").fadeTo(0, 1.0);
 
 		// clean up shelf display area
 		$shelf.empty();
 
+		// render individual product view
 		collection.each(function(model, i) {
 
 			var productComponentView = new app.ProductComponentView({
@@ -99,7 +125,18 @@ app.AppPageView = Backbone.View.extend({
 				path : app.Config.ratyPath
 			});
 		});
+		
+		// assign popover
+		//$("[rel=\"clickover\"]").clickover();
+		$(document).on("click", ".product-image", function(e) {
+			
+			console.log("product.id: " + $(e.target).parent().parent().attr("id"));
+			
+			$(e.target).clickover({html : true});
+			$(e.target).clickover("show");
+		});
 
+		this.onFilterChanged();
 	},
 
 	onProductFetchSuccess : function(response, xhr) {
@@ -110,15 +147,29 @@ app.AppPageView = Backbone.View.extend({
 		console.log("onProductFetchError");
 	},
 
+	// clear filters button
+	onClearFiltersButtonClicked: function(e) {
+		$brandDropdown.find(".dropdown-menu a:first").trigger("click");
+		$typeDropdown.find(".dropdown-menu a:first").trigger("click");
+		$sortDropdown.find(".dropdown-menu a:first").trigger("click");
+		
+		var sizeLow = $sizeSlider.slider("option", "min");
+		var sizeHigh = $sizeSlider.slider("option", "max");
+		
+		$sizeSlider.slider("option", "values", [sizeLow, sizeHigh]);
+		
+		this.onFilterChanged();
+	},
+	
 	// slider events
 	onSizeSliderChanged : function(e) {
-		console.log("onSizeSliderChanged");
+		this.onFilterChanged();
 	},
 
 	// brand dropdown events
 	onBrandDropdownClicked : function(e) {
 		e.preventDefault();
-		
+
 		var $brandDropdownButton = $brandDropdown.find(".btn");
 
 		var oldValue = $brandDropdownButton.val();
@@ -136,8 +187,6 @@ app.AppPageView = Backbone.View.extend({
 	},
 
 	onBrandDropdownChanged : function(newValue, oldValue) {
-		console.log("onBrandDropdownChanged, newValue:" + newValue
-				+ ", oldValue:" + oldValue);
 
 		this.onFilterChanged();
 	},
@@ -146,7 +195,6 @@ app.AppPageView = Backbone.View.extend({
 	onTypeDropdownClicked : function(e) {
 		e.preventDefault();
 
-		
 		var $typeDropdownButton = $typeDropdown.find(".btn");
 
 		var oldValue = $typeDropdownButton.val();
@@ -172,7 +220,7 @@ app.AppPageView = Backbone.View.extend({
 	// sort dropdown events
 	onSortDropdownClicked : function(e) {
 		e.preventDefault();
-		
+
 		var $sortDropdownButton = $sortDropdown.find(".btn");
 
 		var oldValue = $sortDropdownButton.val();
@@ -197,7 +245,68 @@ app.AppPageView = Backbone.View.extend({
 
 	// change filter
 	onFilterChanged : function() {
-		console.log("onFilterChanged");
+
+		var sizeLow = $sizeSlider.slider("values", 0)
+		var sizeHigh = $sizeSlider.slider("values", 1);
+		var brand = $brandDropdown.find("button").val();
+		var type = $typeDropdown.find("button").val();
+		var sort = $sortDropdown.find("button").val();
+		
+		console.log("sizeLow:"+sizeLow + ", sizeHigh:"+sizeHigh + ",brand:" + brand + ", type:" + type + ", sort:" + sort);
+
+		var filteredModels = this.options.productCollection.filterAndSort(
+				[ sizeLow, sizeHigh ], type, brand, sort);
+		var rejectedModels = _.difference(this.options.productCollection.models,
+				filteredModels);
+
+		this.filteredModels = filteredModels;
+		this.rejectedModels = rejectedModels;
+		
+		var $matchCount = $("#match-count");
+		var matchCount = filteredModels.length;
+		$matchCount.text(matchCount + " "
+				+ (matchCount === 0 ? "MATCH" : "MATCHES"));
+ 
+		this.doLayout();
+	},
+	
+	onWindowResized: function(e) {
+		
+		this.doLayout();
+	},
+	
+	doLayout: function() {
+		
+		_.each(this.rejectedModels, function(model, i) {
+			
+			$("#" + model.id).hide();
+		});
+		
+		var shelfWidth = $shelf.width();	
+		var numProductPerRow = Math.floor(shelfWidth / app.Config.productWidth);
+
+		var row = 0,
+			col = 0;
+		
+		_.each(this.filteredModels, function(model, i) {
+			col = i % numProductPerRow;
+			row = Math.floor(i / numProductPerRow);
+			
+			var id = model.id;
+			var $product = $("#" + id);
+
+			$product.css({"width": app.Config.productWidth, "height": app.Config.productHeight});
+			$product.show();
+			
+			var left = shelfWidth / numProductPerRow;
+			$product.animate({
+				"left" : col * left +  "px", 
+				"top" : row * app.Config.productHeight +  "px"}, 
+				app.Config.animationDuration); 
+
+		});
+		
+		$shelf.animate({height: (row  + 1) * app.Config.productHeight}, app.Config.animationDuration);
 	}
 
 });

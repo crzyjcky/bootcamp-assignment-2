@@ -1,4 +1,9 @@
 
+/* control panel */
+#control-panel {
+	opacity: 0.0;
+}
+
 /* shelf */
 #shelf {
 	position: relative;
