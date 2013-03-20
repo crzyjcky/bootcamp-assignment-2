@@ -11,5 +11,8 @@ app.Config = {
 
 	// rating
 	"ratyWidth" : 150,
-	"ratyPath" : "img"
+	"ratyPath" : "img",
+	
+	// length
+	"aboutMaxLength" : 200
 };

@@ -1,4 +1,33 @@
+/* carousel */
+.carousel-inner>.item>img {
+	margin: 0 auto;
+	xheight: 320px;
+}
 
+/* panel */
+.zpanel {
+	width: 1024px;
+}
+
+/* popover */
+.popover {
+	max-width: 100%;
+	min-width: 40%;
+}
+/*
+.my-popover-inner {
+	max-width: auto;
+}
+
+.xpopover-inner {
+	width: 600px !important;
+	xxmax-width: 100%;
+}
+
+.xpopover-content {
+	max-width: 600px;
+}
+*/
 /* control panel */
 #control-panel {
 	opacity: 0.0;

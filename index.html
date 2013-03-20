@@ -92,7 +92,8 @@
 				<div class="pull-right">
 					<label>Type</label>
 					<div id="type-dropdown" class="btn-group">
-						<button class="btn dropdown-toggle" data-toggle="dropdown" value="All">
+						<button class="btn dropdown-toggle" data-toggle="dropdown"
+							value="All">
 							All <span class="caret"></span>
 						</button>
 						<ul class="dropdown-menu">
@@ -110,7 +111,8 @@
 				<div class="pull-right">
 					<label>Brand</label>
 					<div id="brand-dropdown" class="btn-group">
-						<button class="btn dropdown-toggle" data-toggle="dropdown" value="All">
+						<button class="btn dropdown-toggle" data-toggle="dropdown"
+							value="All">
 							All <span class="caret"></span>
 						</button>
 						<ul class="dropdown-menu">
@@ -124,7 +126,8 @@
 				<div class="pull-right">
 					<label>Sort</label>
 					<div id="sort-dropdown" class="btn-group">
-						<button class="btn dropdown-toggle" data-toggle="dropdown" value="Price">
+						<button class="btn dropdown-toggle" data-toggle="dropdown"
+							value="Price">
 							Price <span class="caret"></span>
 						</button>
 						<ul class="dropdown-menu">
@@ -141,9 +144,10 @@
 
 		<div class="row-fluid">
 			<div class="span12">
-				<span><strong id="match-count">0 MATCHES</strong> FOR TELEVISIONS FITTING THAT
-					CRITERIA</span>
-				<button id="clear-filters-button" class="btn pull-right">Clear Filters</button>
+				<span><strong id="match-count">0 MATCHES</strong> FOR
+					TELEVISIONS FITTING THAT CRITERIA</span>
+				<button id="clear-filters-button" class="btn pull-right">Clear
+					Filters</button>
 			</div>
 
 		</div>
@@ -223,25 +227,168 @@
 
 	<!-- templates -->
 	<script type="text/template" id="product-template">
-	<a href="#" rel="clickover" data-content="
-            click over content.
-            &lt;pre&gt;$('[rel='clickover']').clickover();&lt;/pre&gt;
-            &lt;button class='btn' data-toggle='button' data-dismiss='clickover'
-            &gt;Close&lt;/button&gt;" data-original-title="clickover code" data-clickover-open="1" ></a>
-<img data-src="holder.js/300x200" alt=""  tabindex="0"  class="product-image" src="<%= image %>" />
+	<div rel="clickover">
+		<img data-src="holder.js/300x200" alt="" tabindex="0"  class="product-image" src="<%= image %>" />
+	</div>
 	<div><%= name %></div>
 	<div>$<%= price.toFixed(2) %></div>
-	<div class="rating"></div>
+	<div class="rating" data-score="<%= rating %>"></div>
 	</script>
+
+
+
+	<script type="text/template" id="panel-template">
+	<button class="close">X</button>
+	<div class="general-info">
+		<table>
+			<tr>
+				<td colspan="2"><h2 class="name"></h2></td>
+			</tr>
+			<tr>
+				<td colspan="2"><img class="customer-rating" /> <a
+					class="btn btn-link">Write a Review</a> | <a class="btn btn-link">Ask
+						a Question</a></td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<div class="product-carousel"></div>
+
+				</td>
+			</tr>
+			<tr>
+				<td width="50%">
+					<h3>About</h3>
+					<p class="about">
+					</p>
+				</td>
+				<td width="50%">
+					<button class="btn">Qty</button>
+					<button class="btn btn-warning">Add to Cart</button>
+					<div class="row-fluid">
+					<a class="btn btn-link"><i class="icon-map-marker"></i> Find This product Locally</a><br /> 
+					<a class="btn btn-link"><i	class="icon-gift"></i> Calculate Arrival Date</a><br />
+					<a class="btn btn-link"><i class="icon-random"></i> Share With a Friend</a><br />
+					</div>
+				</td>
+			</tr>
+		</table>
+	</div>
 	
-	<script type="text/template" id="clickover-placeholder-template">
+	<hr />
+	
+	<div class="recommendation">
+	
+		<button class="btn pull-right">See More <i class="icon-chevron-right"></i></button>
+		<h3>People Who Viewed This Item Also Viewed</h3>
+		
+		<div class="also-viewed"></div>
+	</div>
+	
+	<hr />
+	
+	<div class="product-details">
+
+		<button class="btn pull-right">Have a Question? <i class="icon-chevron-right"></i></button>
+		<h3>Product Details</h3>
+		
+		<div class="nav"></div>
+	</div>
+	</script>
+
+	<script type="text/template" id="also-viewed-template">
+		<table width="100%">
+			<tr>
+				<%
+					var productCount = products.length;
+					var len = 3;
+					for (var i = 0; i < len; i++) {
+						var randomProduct = products[Math.floor(Math.random() * productCount)];
+				%>
+				<td width="33%">
+					<img src="<%= randomProduct.image %>" /><br/>
+						<div><%= randomProduct.name %></div>
+						<div>$<%= randomProduct.price.toFixed(2) %></div>
+						<div class="rating" data-score="<%= randomProduct.rating %>"></div>
+				</td>
+				<%
+					}
+				%>
+			</tr>
+		</table>
+	</script>
+
+	<script type="text/template" id="nav-template">
+		<div class="tabbable tabs-left">
+	    <ul class="nav nav-tabs">
+	      <li class="active"><a href="#nav-<%= id %>-0" data-toggle="tab">Full Description</a></li>
+	      <li><a href="#nav-<%= id %>-1" data-toggle="tab">Specifications</a></li>
+	      <li><a href="#nav-<%= id %>-2" data-toggle="tab">Warranty</a></li>
+	      <li><a href="#nav-<%= id %>-3" data-toggle="tab">Financing</a></li>
+	      <li><a href="#nav-<%= id %>-4" data-toggle="tab">Gifting</a></li>
+	    </ul>
+	    <div class="tab-content">
+	      <div class="tab-pane active" id="nav-<%= id %>-0">
+	        <p><%= longDescription %></p>
+	      </div>
+	      <div class="tab-pane" id="nav-<%= id %>-1">
+	        <p>Specifications</p>
+	      </div>
+	      <div class="tab-pane" id="nav-<%= id %>-2">
+	        <p><%= warranty %></p>
+	      </div>
+	      <div class="tab-pane" id="nav-<%= id %>-3">
+	        <p>Financing</p>
+	      </div>
+	      <div class="tab-pane" id="nav-<%= id %>-4">
+	        <p>Gifting</p>
+	      </div>
+	    </div>
+	  </div>
+	</script>
+
+	<script type="text/template" id="carousel-template">
+	<div id="carousel-<%= id %>" class="carousel slide">
+		<ol class="carousel-indicators">
+			<% _.each(largeImages, function(largeImage, i) {
+				if (i === 0) {
+			%>
+				<li data-target="#carousel-<%= id %>" data-slide-to="<%= i %>" class="active"></li>
+			<%
+				} else {
+			%>
+				<li data-target="#carousel-<%= id %>" data-slide-to="<%= i %>"></li>
+			<%
+				}
+			});
+			%>
+		</ol>
+		<!-- Carousel items -->
+		<div class="carousel-inner">
+			<% _.each(largeImages, function(largeImage, i) {
+				if (i === 0) {
+			%>
+				<div class="active item"><img src="<%= largeImage %>" /></div>
+			<%
+				} else {
+			%>
+				<div class="item"><img src="<%= largeImage %>" /></div>
+			<%
+				}
+			});
+			%>		
+		</div>
+		<!-- Carousel nav -->
+		<a class="carousel-control left" href="#carousel-<%= id %>"
+			data-slide="prev">&lsaquo;</a> <a class="carousel-control right"
+			href="#carousel-<%= id %>" data-slide="next">&rsaquo;</a>
+	</div>
 	</script>
 
 	<!-- JavaScript libraries -->
-    
+
 	<script src="js/lib/jquery.min.js"></script>
 	<script src="js/lib/bootstrap.min.js"></script>
-	<script src="js/lib/jquery-ui.min.js"></script>	
+	<script src="js/lib/jquery-ui.min.js"></script>
 	<script src="js/lib/underscore-min.js"></script>
 	<script src="js/lib/backbone-min.js"></script>
 	<script src="js/lib/jquery.raty.min.js"></script>
@@ -249,7 +396,7 @@
 
 	<!-- Config -->
 	<script src="js/config/Config.js"></script>
-	
+
 	<!-- Models -->
 	<script src="js/model/ProductModel.js"></script>
 	<script src="js/model/ProductDetailModel.js"></script>
@@ -263,14 +410,21 @@
 	<!-- Views -->
 	<script src="js/AppPageView.js"></script>
 	<script src="js/view/ProductComponentView.js"></script>
+	<script src="js/view/PanelComponentView.js"></script>
+	<script src="js/view/CarouselComponentView.js"></script>
+	<script src="js/view/NavComponentView.js"></script>
+	<script src="js/view/AlsoViewedComponentView.js"></script>
+
 	<script>
 		var app = app || {};
 
 		app.productCollection = new app.ProductCollection();
+		app.productDetailCollection = new app.ProductDetailCollection();
+
 		app.appPageView = new app.AppPageView({
 			"productCollection" : app.productCollection,
-			"productDetailCollection" : app.productDetailCollection,
-			"reviewCollection" : app.reviewCollection
+			"productDetailCollection" : app.productDetailCollection
+		//"reviewCollection" : app.reviewCollection
 		});
 	</script>
 </body>
